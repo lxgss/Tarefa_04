@@ -7,12 +7,14 @@ function App() {
   const [search, setSearch] = useState("");
   const [randomCard, setRandomCard] = useState(null);
   const [sorted, setSorted] = useState(false);
+  const [loading, setLoading] = useState(true); // TAREFA 4: Estado de loading
 
-  // TAREFA 2: Ir buscar as cartas ao server uma vez quando a página abre
   useEffect(() => {
     fetch("http://localhost:3000/api/cartas")
       .then((res) => res.json())
-      .then((data) => setCards(data));
+      .then((data) => setCards(data))
+      .catch((err) => console.error("Erro ao carregar cartas:", err))
+      .finally(() => setLoading(false)); // TAREFA 4: Desativa o loading no fim
   }, []);
 
   let visible = cards
@@ -33,42 +35,49 @@ function App() {
     <main>
       <h1>A minha coleção</h1>
 
-      <p>
-        Tenho {cards.length} cartas · a mostrar {visible.length}
-      </p>
-
-      <div>
-        <button onClick={() => setFilter("Todas")}>Todas</button>
-        <button onClick={() => setFilter("Criatura")}>Só criaturas</button>
-        <button onClick={() => setFilter("Feitiço")}>Só feitiços</button>
-        <button onClick={() => setSorted(!sorted)}>
-          {sorted ? "Ordem original" : "Ordenar por ataque"}
-        </button>
-      </div>
-
-      <input
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        placeholder="Procurar pelo nome…"
-      />
-
-      {visible.length === 0 ? (
-        <p>Nenhuma carta corresponde.</p>
+      {/* TAREFA 4: Mostrar mensagem enquanto carrega */}
+      {loading ? (
+        <p>A carregar…</p>
       ) : (
-        <ul>
-          {visible.map((card) => (
-            <Card key={card.name} {...card} />
-          ))}
-        </ul>
-      )}
+        <>
+          <p>
+            Tenho {cards.length} cartas · a mostrar {visible.length}
+          </p>
 
-      <h2>Carta à sorte</h2>
-      <button onClick={pickRandom}>Escolher outra</button>
-      {randomCard && (
-        <p>
-          <b>{randomCard.name}</b> — {randomCard.type} · ataque {randomCard.attack} ·
-          defesa {randomCard.defense}
-        </p>
+          <div>
+            <button onClick={() => setFilter("Todas")}>Todas</button>
+            <button onClick={() => setFilter("Criatura")}>Só criaturas</button>
+            <button onClick={() => setFilter("Feitiço")}>Só feitiços</button>
+            <button onClick={() => setSorted(!sorted)}>
+              {sorted ? "Ordem original" : "Ordenar por ataque"}
+            </button>
+          </div>
+
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Procurar pelo nome…"
+          />
+
+          {visible.length === 0 ? (
+            <p>Nenhuma carta corresponde.</p>
+          ) : (
+            <ul>
+              {visible.map((card) => (
+                <Card key={card.name} {...card} />
+              ))}
+            </ul>
+          )}
+
+          <h2>Carta à sorte</h2>
+          <button onClick={pickRandom}>Escolher outra</button>
+          {randomCard && (
+            <p>
+              <b>{randomCard.name}</b> — {randomCard.type} · ataque {randomCard.attack} ·
+              defesa {randomCard.defense}
+            </p>
+          )}
+        </>
       )}
     </main>
   );
