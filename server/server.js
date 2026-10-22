@@ -53,8 +53,9 @@ app.get("/cartas", (req, res) => {
   res.send(page("Cartas", `<ul>${items}</ul>`));
 });
 
-// --- TAREFA 1: Rota GET /api/cartas ---
+// --- TAREFA 1 & 3: Rota GET /api/cartas com CORS ---
 app.get("/api/cartas", (req, res) => {
+  res.set("Access-Control-Allow-Origin", "http://localhost:5173");
   res.json(cards);
 });
 
